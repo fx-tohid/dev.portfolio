@@ -86,7 +86,7 @@ export default function Home() {
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-6">
-              Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-green to-accent-cyan">Towhid</span>.
+              Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-green to-accent-cyan">Nazrul Islam</span>.
               <br />
               <span className="text-3xl md:text-5xl text-muted-foreground mt-2 inline-block">
                 Frontend Engineer.
@@ -127,14 +127,14 @@ export default function Home() {
                   <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
                 </div>
                 <div className="mx-auto flex items-center text-xs text-muted-foreground font-mono">
-                  <Terminal className="w-3 h-3 mr-2" /> bash - tohid@dev-machine
+                  <Terminal className="w-3 h-3 mr-2" /> bash - nazrul@dev-machine
                 </div>
               </div>
 
               {/* Terminal Body */}
               <div className="p-6 font-mono text-sm leading-relaxed text-muted-foreground h-[300px] overflow-y-auto">
                 <div>
-                  <span className="text-accent-green">tohid@dev-machine</span>
+                  <span className="text-accent-green">nazrul@dev-machine</span>
                   <span className="text-white">:</span>
                   <span className="text-blue-400">~/portfolio</span>
                   <span className="text-white">$ </span>
