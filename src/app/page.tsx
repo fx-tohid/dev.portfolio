@@ -86,7 +86,7 @@ export default function Home() {
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-6">
-              Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-green to-accent-cyan">Nazrul Islam</span>.
+              Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-green to-accent-cyan">Nazrul</span>.
               <br />
               <span className="text-3xl md:text-5xl text-muted-foreground mt-2 inline-block">
                 Frontend Engineer.
