@@ -87,7 +87,14 @@ export default function About() {
     ];
 
     const handleDownloadResume = () => {
-        window.print();
+        // Add a class to body to signal printing if needed
+        document.body.classList.add('is-printing');
+
+        // Small delay to ensure Recharts and Framer Motion finish layout calcs
+        setTimeout(() => {
+            window.print();
+            document.body.classList.remove('is-printing');
+        }, 500);
     };
 
     if (loading) {
@@ -110,7 +117,7 @@ export default function About() {
                 transition={{ duration: 0.8 }}
                 className="mb-24 relative"
             >
-                <div className="absolute -left-20 top-0 w-64 h-64 bg-accent-primary/10 rounded-full blur-[100px] pointer-events-none opacity-40"></div>
+                <div className="absolute -left-20 top-0 w-64 h-64 bg-accent-primary/10 rounded-full blur-[100px] pointer-events-none opacity-40 absolute-decorative"></div>
 
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10">
                     <h1 className="text-5xl md:text-7xl font-bold font-sans text-white flex items-center group tracking-tight">
@@ -151,7 +158,7 @@ export default function About() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Linear Skill Matrix */}
                     <div className="bg-white/[0.01] border border-white/5 p-12 rounded-[40px] backdrop-blur-md relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 absolute-decorative"></div>
                         <p className="text-[10px] font-black text-accent-primary uppercase tracking-[0.4em] mb-10 opacity-60">Tech_Stack_Array</p>
                         <div className="space-y-8">
                             {skills.length > 0 ? skills.slice(0, 6).map((skill, index) => (
@@ -238,7 +245,7 @@ export default function About() {
                             <div className="absolute w-3 h-3 rounded-full bg-white/10 group-hover:bg-accent-primary -left-[54.5px] top-8 border-[3px] border-background transition-all duration-500 group-hover:scale-125" />
 
                             <div className="glass-card p-12 hover:border-accent-primary/30 transition-all duration-500 overflow-hidden relative shadow-xl">
-                                <div className="absolute -right-10 -bottom-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity rotate-12 duration-1000">
+                                <div className="absolute -right-10 -bottom-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity rotate-12 duration-1000 absolute-decorative">
                                     <Briefcase className="w-48 h-48 text-accent-secondary" />
                                 </div>
 

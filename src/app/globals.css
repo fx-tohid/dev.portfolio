@@ -2,14 +2,10 @@
 
 :root {
   --background: #020617;
-  /* Deep Slate */
   --foreground: #f8fafc;
   --accent-primary: #6366f1;
-  /* Indigo */
   --accent-secondary: #a855f7;
-  /* Purple */
   --accent-green: #10b981;
-  /* Emerald for success/status */
   --muted-foreground: #94a3b8;
   --panel-bg: rgba(15, 23, 42, 0.6);
   --panel-border: rgba(148, 163, 184, 0.1);
@@ -42,13 +38,8 @@ body {
 }
 
 /* Premium Glow Utilities */
-.glow-text-primary {
-  text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
-}
-
-.glow-border-primary {
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.1), inset 0 0 10px rgba(99, 102, 241, 0.05);
-}
+.glow-text-primary { text-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
+.glow-border-primary { box-shadow: 0 0 30px rgba(99, 102, 241, 0.1), inset 0 0 10px rgba(99, 102, 241, 0.05); }
 
 /* Premium Glassmorphism */
 .glass-panel {
@@ -72,139 +63,128 @@ body {
 }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--background);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.2);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary);
-}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--background); }
+::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.2); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
 
 @keyframes float {
-  0% {
-    transform: translateY(0px) rotate(0deg);
-  }
-
-  50% {
-    transform: translateY(-15px) rotate(1deg);
-  }
-
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
 }
-
-.animate-float {
-  animation: float 8s ease-in-out infinite;
-}
+.animate-float { animation: float 8s ease-in-out infinite; }
 
 @keyframes scan {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
-
-  100% {
-    transform: translateY(100%);
-    opacity: 0;
-  }
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { transform: translateY(100%); opacity: 0; }
 }
-
-.animate-scan {
-  animation: scan 8s linear infinite;
-}
+.animate-scan { animation: scan 8s linear infinite; }
 
 @keyframes pulse-soft {
-  0% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.5;
-    transform: scale(1.05);
-  }
-
-  100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
+  0% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.05); }
+  100% { opacity: 0.3; transform: scale(1); }
 }
+.animate-pulse-soft { animation: pulse-soft 4s ease-in-out infinite; }
 
-.animate-pulse-soft {
-  animation: pulse-soft 4s ease-in-out infinite;
-}
 /* Print Styles for PDF Resume */
 @media print {
-  .no-print, header, footer, button, nav {
-    display: none !important;
-  }
-  
-  body {
+  html, body {
     background: white !important;
     color: black !important;
     background-image: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Hide UI boilerplate */
+  header, footer, nav, button, .no-print, [role="navigation"], .absolute-decorative {
+    display: none !important;
+  }
+
+  /* Force visibility for all containers */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+  }
+
+  /* Page setup */
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    color: #000 !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 0.75rem !important;
+    page-break-after: avoid;
+  }
+
+  p, span, li, b, label {
+    color: #222 !important;
+  }
+
+  /* Layout cleanup */
+  .max-w-7xl, .max-w-5xl, .max-w-4xl {
+    max-width: 100% !important;
+    width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
   }
 
-  .max-w-5xl, .max-w-7xl, .max-w-4xl {
-    max-width: 100% !important;
-    width: 100% !important;
-    padding: 20px !important;
-    margin: 0 !important;
-  }
-
-  h1, h2, h3, h4 {
-    color: black !important;
-  }
-
-  p, span, div {
-    color: #111 !important;
-  }
-
-  .glass-panel, .glass-card {
-    background: transparent !important;
-    border: 1px solid #eee !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
+  /* Skill bars / Accent elements */
+  .glass-card, .glass-panel {
+    background: #ffffff !important;
+    border: 1px solid #eeeeee !important;
+    border-radius: 4px !important;
+    padding: 1rem !important;
     break-inside: avoid;
-    margin-bottom: 20px;
   }
 
-  .bg-accent-primary, .bg-accent-secondary {
-    background-color: #f0f0f0 !important;
-    border: 1px solid #ccc !important;
+  .bg-accent-primary { background: #6366f115 !important; border: 1px solid #6366f130 !important; }
+  .text-accent-primary { color: #4338ca !important; font-weight: 800 !important; }
+
+  /* Recharts Specific fixes */
+  .recharts-responsive-container {
+    width: 100% !important;
+    height: 350px !important;
   }
 
-  .text-accent-primary, .text-accent-secondary {
-    color: #444 !important;
-    font-weight: 800 !important;
+  .recharts-polar-grid-angle, .recharts-polar-grid-concentric {
+    stroke: #e2e8f0 !important;
+    stroke-opacity: 1 !important;
   }
 
-  .border-accent-primary, .border-accent-secondary {
-    border-color: #ccc !important;
+  .recharts-polar-angle-axis-tick text {
+    fill: #1e293b !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
   }
 
-  svg {
-    filter: invert(1) !important;
+  .recharts-radar {
+    fill: #6366f1 !important;
+    fill-opacity: 0.2 !important;
+    stroke: #6366f1 !important;
   }
 
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+  /* Contact / Info cleanup */
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.75rem;
+    color: #475569;
   }
 }
