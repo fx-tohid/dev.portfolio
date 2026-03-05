@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Terminal, Send, CheckCircle, AlertCircle } from "lucide-react";
+import { Send, CheckCircle, AlertCircle, Mail, Zap, Globe, Shield, Loader2 } from "lucide-react";
 
 export default function Contact() {
     const [formState, setFormState] = useState({
@@ -50,138 +50,177 @@ export default function Contact() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 min-h-[calc(100vh-160px)] flex flex-col justify-center">
-
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 pb-60 transition-all duration-300">
+            {/* Header section - Architectural Style */}
             <motion.div
-                initial={{ opacity: 0, y: -20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="mb-12 text-center"
+                transition={{ duration: 0.8 }}
+                className="mb-24 relative text-center"
             >
-                <h1 className="text-4xl font-bold font-mono text-accent-green mb-4 flex items-center justify-center">
-                    <Terminal className="inline-block mr-4 w-8 h-8" />
-                    ./contact.sh
+                <div className="absolute left-1/2 -translate-x-1/2 top-0 w-80 h-80 bg-accent-primary/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+
+                <h1 className="text-5xl md:text-7xl font-black font-sans text-white mb-8 tracking-tighter leading-none">
+                    Contact Me<span className="text-accent-primary animate-pulse">.</span>
                 </h1>
-                <p className="text-muted-foreground max-w-lg mx-auto">
-                    Interested in working together or just want to say hi? Drop me a message below.
-                    My inbox is always open.
+                <p className="text-xl text-muted-foreground/80 max-w-2xl leading-relaxed font-light mx-auto">
+                    Have a project in mind or just want to say hello? I'm always open to discussing new opportunities and creative ideas.
                 </p>
             </motion.div>
 
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="relative bg-panel-bg border border-panel-border p-8 rounded-xl backdrop-blur-md shadow-2xl overflow-hidden max-w-2xl mx-auto w-full"
-            >
-                {/* Decorative elements */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-accent-green/10 rounded-full blur-3xl -z-10" />
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-accent-cyan/10 rounded-full blur-3xl -z-10" />
-
-                <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-                    <div>
-                        <label htmlFor="name" className="block text-sm font-mono text-muted-foreground mb-2">
-                            <span className="text-accent-cyan mr-2">$</span>
-                            read -p "Enter Name:" name
-                        </label>
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={formState.name}
-                            onChange={handleChange}
-                            disabled={status === "submitting"}
-                            className="w-full bg-black/50 border border-panel-border rounded bg-transparent px-4 py-3 text-foreground font-mono focus:border-accent-green focus:outline-none focus:ring-1 focus:ring-accent-green transition-colors disabled:opacity-50"
-                            placeholder="Your Name"
-                            required
-                        />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start max-w-6xl mx-auto">
+                {/* Visualizer & Info Side */}
+                <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                    className="lg:col-span-5 space-y-8"
+                >
+                    <div className="glass-card p-8 rounded-[32px] border border-white/5 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+                            <Mail className="w-24 h-24 text-accent-primary" />
+                        </div>
+                        <h3 className="text-xs font-mono text-accent-primary uppercase tracking-[0.5em] mb-6">Contact Details</h3>
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
+                                    <Globe className="w-5 h-5 text-accent-primary" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-white/40 font-mono uppercase tracking-widest">Availability</p>
+                                    <p className="text-white font-bold">Ready for Remote work</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
+                                    <Shield className="w-5 h-5 text-accent-secondary" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-white/40 font-mono uppercase tracking-widest">Direct Email</p>
+                                    <p className="text-white font-bold">Encrypted Channel</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-mono text-muted-foreground mb-2">
-                            <span className="text-accent-cyan mr-2">$</span>
-                            read -p "Enter Email:" email
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formState.email}
-                            onChange={handleChange}
-                            disabled={status === "submitting"}
-                            className="w-full bg-black/50 border border-panel-border rounded bg-transparent px-4 py-3 text-foreground font-mono focus:border-accent-cyan focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-colors disabled:opacity-50"
-                            placeholder="you@example.com"
-                            required
-                        />
+                    <div className="glass-panel p-8 rounded-[32px] border border-white/5 font-mono text-[10px] text-white/30 space-y-4">
+                        <p className="text-accent-primary opacity-60 font-bold uppercase tracking-widest">Status Monitor:</p>
+                        <div className="space-y-1 text-white/50">
+                            <p><span className="text-accent-primary">❯</span> Secure connection established</p>
+                            <p><span className="text-accent-primary">❯</span> Server ready for message</p>
+                        </div>
                     </div>
+                </motion.div>
 
-                    <div>
-                        <label htmlFor="message" className="block text-sm font-mono text-muted-foreground mb-2">
-                            <span className="text-accent-cyan mr-2">$</span>
-                            cat &lt;&lt; EOF &gt; message.txt
-                        </label>
-                        <textarea
-                            id="message"
-                            name="message"
-                            value={formState.message}
-                            onChange={handleChange}
+                {/* Form Side - Premium IDE style */}
+                <motion.div
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                    className="lg:col-span-7 glass-panel p-10 rounded-[40px] border border-white/10 shadow-2xl relative"
+                >
+                    <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent-primary via-accent-secondary to-accent-primary opacity-40"></div>
+
+                    <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-3">
+                                <label htmlFor="name" className="text-[10px] font-mono text-accent-primary uppercase tracking-[0.3em] ml-1">
+                                    Your Name
+                                </label>
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    value={formState.name}
+                                    onChange={handleChange}
+                                    disabled={status === "submitting"}
+                                    className="w-full bg-[#050505] border border-white/10 rounded-2xl p-4 text-white font-sans text-sm focus:border-accent-primary outline-none shadow-inner transition-all hover:border-white/20 disabled:opacity-50"
+                                    placeholder="Enter your name"
+                                    required
+                                />
+                            </div>
+
+                            <div className="space-y-3">
+                                <label htmlFor="email" className="text-[10px] font-mono text-accent-primary uppercase tracking-[0.3em] ml-1">
+                                    Your Email
+                                </label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value={formState.email}
+                                    onChange={handleChange}
+                                    disabled={status === "submitting"}
+                                    className="w-full bg-[#050505] border border-white/10 rounded-2xl p-4 text-white font-sans text-sm focus:border-accent-primary outline-none shadow-inner transition-all hover:border-white/20 disabled:opacity-50"
+                                    placeholder="you@example.com"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-3">
+                            <label htmlFor="message" className="text-[10px] font-mono text-accent-primary uppercase tracking-[0.3em] ml-1">
+                                Your Message
+                            </label>
+                            <textarea
+                                id="message"
+                                name="message"
+                                value={formState.message}
+                                onChange={handleChange}
+                                disabled={status === "submitting"}
+                                rows={6}
+                                className="w-full bg-[#050505] border border-white/10 rounded-2xl p-4 text-white font-sans text-sm focus:border-accent-primary outline-none shadow-inner transition-all hover:border-white/20 resize-none disabled:opacity-50"
+                                placeholder="How can I help you?"
+                                required
+                            />
+                        </div>
+
+                        <motion.button
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.98 }}
                             disabled={status === "submitting"}
-                            rows={5}
-                            className="w-full bg-black/50 border border-panel-border rounded bg-transparent px-4 py-3 text-foreground font-mono focus:border-accent-green focus:outline-none focus:ring-1 focus:ring-accent-green transition-colors resize-none disabled:opacity-50"
-                            placeholder="Your message here..."
-                            required
-                        />
-                    </div>
-
-                    <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        disabled={status === "submitting"}
-                        type="submit"
-                        className="w-full relative px-6 py-4 font-mono font-bold text-background bg-gradient-to-r from-accent-green to-accent-cyan rounded overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed group transition-all"
-                    >
-                        <span className="relative z-10 flex items-center justify-center">
-                            {status === "idle" && (
-                                <>
-                                    <Send className="mr-2 w-4 h-4" />
-                                    ./send_message.sh
-                                </>
-                            )}
-                            {status === "submitting" && (
-                                <>
-                                    <motion.div
-                                        animate={{ rotate: 360 }}
-                                        transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                                        className="mr-2 w-4 h-4 rounded-full border-2 border-background border-t-transparent"
-                                    />
-                                    Transmitting...
-                                </>
-                            )}
-                            {status === "success" && (
-                                <motion.span
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="flex items-center text-background"
-                                >
-                                    <CheckCircle className="mr-2 w-4 h-4" />
-                                    Message Delivered
-                                </motion.span>
-                            )}
-                            {status === "error" && (
-                                <motion.span
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="flex items-center text-red-900"
-                                >
-                                    <AlertCircle className="mr-2 w-4 h-4" />
-                                    Transmission Failed
-                                </motion.span>
-                            )}
-                        </span>
-                        <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
-                    </motion.button>
-                </form>
-            </motion.div>
+                            type="submit"
+                            className="w-full relative py-5 font-mono font-black text-white bg-accent-primary rounded-2xl overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed group shadow-xl hover:shadow-accent-primary/20 transition-all uppercase tracking-[0.5em] text-xs"
+                        >
+                            <span className="relative z-10 flex items-center justify-center">
+                                {status === "idle" && (
+                                    <>
+                                        <Send className="mr-3 w-4 h-4" />
+                                        Send Message
+                                    </>
+                                )}
+                                {status === "submitting" && (
+                                    <>
+                                        <Loader2 className="mr-3 w-4 h-4 animate-spin" />
+                                        Sending...
+                                    </>
+                                )}
+                                {status === "success" && (
+                                    <motion.span
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="flex items-center"
+                                    >
+                                        <CheckCircle className="mr-3 w-4 h-4" />
+                                        Message Sent
+                                    </motion.span>
+                                )}
+                                {status === "error" && (
+                                    <motion.span
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="flex items-center text-red-100"
+                                    >
+                                        <AlertCircle className="mr-3 w-4 h-4" />
+                                        Sending Failed
+                                    </motion.span>
+                                )}
+                            </span>
+                            <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[0%] transition-transform duration-500" />
+                        </motion.button>
+                    </form>
+                </motion.div>
+            </div>
         </div>
     );
 }

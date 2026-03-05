@@ -64,3 +64,39 @@ export async function GET() {
         );
     }
 }
+
+export async function DELETE(request: Request) {
+    try {
+        const supabase = await createServerClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get("id");
+
+        if (!id) {
+            return NextResponse.json({ error: "Missing ID" }, { status: 400 });
+        }
+
+        if (id === "all") {
+            // Bulk delete all messages
+            const { error } = await supabase.from("contacts").delete().neq("id", "00000000-0000-0000-0000-000000000000"); // Effectively deletes all
+            if (error) throw error;
+            return NextResponse.json({ message: "All messages purged" });
+        } else {
+            // Delete specific message
+            const { error } = await supabase.from("contacts").delete().eq("id", id);
+            if (error) throw error;
+            return NextResponse.json({ message: "Message deleted" });
+        }
+    } catch (error: any) {
+        console.error("Contact deletion error:", error);
+        return NextResponse.json(
+            { error: error.message || "Internal server error" },
+            { status: 500 }
+        );
+    }
+}
