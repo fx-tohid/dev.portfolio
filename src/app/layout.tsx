@@ -15,8 +15,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Frontend Developer | Portfolio",
-  description: "A premium, high-performance portfolio website tailored for a frontend developer.",
+  title: "Nazrul | Senior Software Architect",
+  description: "Senior Software Architect specializing in high-performance digital systems, scalable cloud infrastructure, and enterprise-grade frontend applications.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({

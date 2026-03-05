@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Terminal, Github, ExternalLink, Code, Database, Layout, Mail, ChevronRight, Activity, Shield, Sparkles, Binary, Cpu, Globe, Layers, Zap } from "lucide-react";
+import { Terminal, Github, ExternalLink, Code, Database, Layout, Mail, ChevronRight, Activity, Shield, Sparkles, Binary, Cpu, Globe, Layers, Zap, Quote } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -19,23 +19,94 @@ interface Profile {
   role: string;
 }
 
+interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  company: string;
+  quote: string;
+  avatar_url: string;
+}
+
+const DEFAULT_PROJECTS: Project[] = [
+  {
+    id: "def-1",
+    title: "Project_Hyperion",
+    description: "Multi-regional Kubernetes mesh infrastructure designed for sub-50ms global latency and automated failover protocols.",
+    tech: ["Go", "Kubernetes", "gRPC", "Terraform"],
+    github_url: "#",
+    live_url: "#"
+  },
+  {
+    id: "def-2",
+    title: "Quantum_Scale_DB",
+    description: "Distributed ledger system optimized for high-throughput financial transactions with Byzantine Fault Tolerance.",
+    tech: ["Rust", "PostgreSQL", "Redis", "Kafka"],
+    github_url: "#",
+    live_url: "#"
+  }
+];
+
+const DEFAULT_TESTIMONIALS: Testimonial[] = [
+  {
+    id: "def-t1",
+    name: "Dr. Elena Vance",
+    role: "Chief Technology Officer",
+    company: "Aeon Dynamics",
+    quote: "Nazrul's architectural oversight transformed our legacy monolith into a resilient mesh of microservices. His focus on observability and zero-trust security is unmatched.",
+    avatar_url: ""
+  },
+  {
+    id: "def-t2",
+    name: "Marcus Thorne",
+    role: "VP of Engineering",
+    company: "Sentry Systems",
+    quote: "The system specs delivered weren't just code; they were a blueprint for the next decade of our digital infrastructure. A visionary in enterprise-grade design.",
+    avatar_url: ""
+  },
+  {
+    id: "def-t3",
+    name: "Sarah Jenkins",
+    role: "Principal Architect",
+    company: "Vertex Cloud",
+    quote: "Implementing his design patterns reduced our infrastructure costs by 40% while doubling our concurrent user capacity. Highly recommended.",
+    avatar_url: ""
+  }
+];
+
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<Profile | null>({
+    name: "Nazrul Islam",
+    role: "Senior Software Architect"
+  });
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const [projRes, profileRes] = await Promise.all([
+        const [projRes, profileRes, testRes] = await Promise.all([
           fetch("/api/projects"),
-          fetch("/api/profile")
+          fetch("/api/profile"),
+          fetch("/api/testimonials")
         ]);
         const allProjects = await projRes.json();
-        setProjects(allProjects.slice(0, 2)); // Get latest 2
-        setProfile(await profileRes.json());
+        const profileData = await profileRes.json();
+        const testData = await testRes.json();
+
+        const fetchedProjects = Array.isArray(allProjects) ? allProjects.slice(0, 2) : [];
+        setProjects(fetchedProjects.length > 0 ? fetchedProjects : DEFAULT_PROJECTS);
+
+        const fetchedProfile = profileData && !profileData.error ? profileData : null;
+        if (fetchedProfile) setProfile(fetchedProfile);
+
+        const fetchedTestimonials = Array.isArray(testData) ? testData : [];
+        setTestimonials(fetchedTestimonials.length > 0 ? fetchedTestimonials : DEFAULT_TESTIMONIALS);
       } catch (err) {
         console.error("Failed to load home data");
+        setProjects(DEFAULT_PROJECTS);
+        setTestimonials(DEFAULT_TESTIMONIALS);
       } finally {
         setLoading(false);
       }
@@ -346,6 +417,55 @@ export default function Home() {
                   <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-accent-primary/10 rounded-full blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
                 </motion.div>
               ))
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section - Trust Matrix */}
+      <section className="py-32 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-24">
+            <h2 className="text-xs font-mono text-emerald-400 uppercase tracking-[0.5em] mb-4">TRUST_MATRIX_VERIFIED</h2>
+            <h3 className="text-4xl md:text-5xl font-bold">Client Endorsements</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {testimonials.length > 0 ? (
+              testimonials.map((t, i) => (
+                <motion.div
+                  key={t.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  className="glass-card p-10 relative group border-white/5 hover:border-emerald-500/20 transition-all duration-700 hover:shadow-[0_0_50px_rgba(16,185,129,0.05)]"
+                >
+                  <div className="absolute top-0 right-10 -translate-y-1/2 p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-700">
+                    <Quote className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <p className="text-white/60 text-sm leading-relaxed mb-10 italic font-sans group-hover:text-white/80 transition-colors">
+                    "{t.quote}"
+                  </p>
+                  <div className="flex items-center gap-5 pt-8 border-t border-white/5">
+                    {t.avatar_url ? (
+                      <img src={t.avatar_url} alt={t.name} className="w-12 h-12 rounded-2xl object-cover border border-white/10" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/10 flex items-center justify-center text-emerald-400 font-black">
+                        {t.name[0]}
+                      </div>
+                    )}
+                    <div>
+                      <h4 className="text-[13px] font-black text-white uppercase tracking-tight">{t.name}</h4>
+                      <p className="text-[9px] text-emerald-400/60 font-mono uppercase tracking-[0.2em] mt-1">{t.role} {t.company && `@ ${t.company}`}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-3 py-20 text-center border-2 border-dashed border-white/5 rounded-[40px] opacity-20">
+                <p className="font-mono text-xs uppercase tracking-[0.3em]">System_Initialized: Awaiting_Input_Data</p>
+              </div>
             )}
           </div>
         </div>

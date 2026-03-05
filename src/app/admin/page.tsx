@@ -6,7 +6,8 @@ import {
     Terminal, Shield, RefreshCcw, Mail, User, Clock, LogOut, Plus,
     Trash2, Folder, ExternalLink, Github, Code, LayoutDashboard,
     Activity, Database, Cpu, HardDrive, Wifi, Lock, AlertCircle,
-    Settings, Star, Save, CheckCircle, Layers, Zap, Box
+    Settings, Star, Save, CheckCircle, Layers, Zap, Box, Quote, FileText,
+    TrendingUp, MessageSquare
 } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
@@ -44,6 +45,26 @@ interface Profile {
     linkedin_url: string;
 }
 
+interface Testimonial {
+    id: string;
+    name: string;
+    role: string;
+    company: string;
+    quote: string;
+    avatar_url: string;
+}
+
+interface BlogPost {
+    id: string;
+    title: string;
+    excerpt: string;
+    content: string;
+    category: string;
+    reading_time: string;
+    image_url: string;
+    published_at: string;
+}
+
 interface SystemStat {
     cpu: number;
     ram: number;
@@ -52,11 +73,13 @@ interface SystemStat {
 }
 
 export default function AdminDashboard() {
-    const [activeTab, setActiveTab] = useState<"overview" | "contacts" | "projects" | "profile" | "skills">("overview");
+    const [activeTab, setActiveTab] = useState<"overview" | "contacts" | "projects" | "profile" | "skills" | "blog" | "testimonials">("overview");
     const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
     const [projects, setProjects] = useState<Project[]>([]);
     const [skills, setSkills] = useState<Skill[]>([]);
     const [profile, setProfile] = useState<Profile | null>(null);
+    const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+    const [posts, setPosts] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -81,10 +104,31 @@ export default function AdminDashboard() {
         category: "Frontend"
     });
 
+    // New Testimonial Form State
+    const [newTestimonial, setNewTestimonial] = useState({
+        name: "",
+        role: "",
+        company: "",
+        quote: "",
+        avatar_url: ""
+    });
+
+    // New Post Form State
+    const [newPost, setNewPost] = useState({
+        title: "",
+        excerpt: "",
+        content: "",
+        category: "Architecture",
+        reading_time: "5 min read",
+        image_url: ""
+    });
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSavingProfile, setIsSavingProfile] = useState(false);
     const [editingProject, setEditingProject] = useState<string | null>(null);
     const [editingSkill, setEditingSkill] = useState<string | null>(null);
+    const [editingTestimonial, setEditingTestimonial] = useState<string | null>(null);
+    const [editingPost, setEditingPost] = useState<string | null>(null);
 
     // Modal State
     const [modal, setModal] = useState<{
@@ -109,17 +153,28 @@ export default function AdminDashboard() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [subRes, projRes, skillRes, profileRes] = await Promise.all([
+            const [subRes, projRes, skillRes, profileRes, testRes, postRes] = await Promise.all([
                 fetch("/api/contact"),
                 fetch("/api/projects"),
                 fetch("/api/skills"),
-                fetch("/api/profile")
+                fetch("/api/profile"),
+                fetch("/api/testimonials"),
+                fetch("/api/posts")
             ]);
 
-            setSubmissions(await subRes.json());
-            setProjects(await projRes.json());
-            setSkills(await skillRes.json());
-            setProfile(await profileRes.json());
+            const subData = await subRes.json();
+            const projData = await projRes.json();
+            const skillData = await skillRes.json();
+            const profileData = await profileRes.json();
+            const testData = await testRes.json();
+            const postData = await postRes.json();
+
+            setSubmissions(Array.isArray(subData) ? subData : []);
+            setProjects(Array.isArray(projData) ? projData : []);
+            setSkills(Array.isArray(skillData) ? skillData : []);
+            setProfile(profileData && !profileData.error ? profileData : null);
+            setTestimonials(Array.isArray(testData) ? testData : []);
+            setPosts(Array.isArray(postData) ? postData : []);
 
             setError(null);
             addLog("System sync complete. All database clusters operational.");
@@ -290,6 +345,119 @@ export default function AdminDashboard() {
         });
     };
 
+    const handleCreateTestimonial = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        addLog(`${editingTestimonial ? 'Updating' : 'Indexing'} endorsement: ${newTestimonial.name}`);
+        try {
+            const res = await fetch("/api/testimonials", {
+                method: editingTestimonial ? "PATCH" : "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(editingTestimonial ? { ...newTestimonial, id: editingTestimonial } : newTestimonial)
+            });
+            if (!res.ok) throw new Error();
+            setNewTestimonial({ name: "", role: "", company: "", quote: "", avatar_url: "" });
+            setEditingTestimonial(null);
+            fetchData();
+            addLog("SUCCESS: Trust matrix updated.");
+        } catch (err) {
+            addLog("ERROR: Endorsement indexing failed.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleEditTestimonial = (testimonial: Testimonial) => {
+        setNewTestimonial({
+            name: testimonial.name,
+            role: testimonial.role,
+            company: testimonial.company || "",
+            quote: testimonial.quote,
+            avatar_url: testimonial.avatar_url || ""
+        });
+        setEditingTestimonial(testimonial.id);
+        setActiveTab("testimonials");
+        addLog(`Loaded endorsement module: ${testimonial.name}`);
+    };
+
+    const handleDeleteTestimonial = async (id: string) => {
+        setModal({
+            isOpen: true,
+            title: "Delete Endorsement",
+            message: "This will permanently remove this testimonial from the trust matrix. Continue?",
+            confirmText: "DELETE",
+            type: "danger",
+            onConfirm: async () => {
+                addLog("Recursing trust data...");
+                try {
+                    await fetch(`/api/testimonials?id=${id}`, { method: "DELETE" });
+                    fetchData();
+                    addLog("SUCCESS: Endorsement purged.");
+                } catch (err) {
+                    addLog("ERROR: Purge failed.");
+                }
+                setModal(prev => ({ ...prev, isOpen: false }));
+            }
+        });
+    };
+
+    const handleCreatePost = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        addLog(`${editingPost ? 'Refactoring' : 'Deploying'} thought node: ${newPost.title}`);
+        try {
+            const res = await fetch("/api/posts", {
+                method: editingPost ? "PATCH" : "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(editingPost ? { ...newPost, id: editingPost } : newPost)
+            });
+            if (!res.ok) throw new Error();
+            setNewPost({ title: "", excerpt: "", content: "", category: "Architecture", reading_time: "5 min read", image_url: "" });
+            setEditingPost(null);
+            fetchData();
+            addLog("SUCCESS: Thought node active.");
+        } catch (err) {
+            addLog("ERROR: Deployment failed.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleEditPost = (post: BlogPost) => {
+        setNewPost({
+            title: post.title,
+            excerpt: post.excerpt,
+            content: post.content,
+            category: post.category,
+            reading_time: post.reading_time,
+            image_url: post.image_url || ""
+        });
+        setEditingPost(post.id);
+        setActiveTab("blog");
+        addLog(`Editing thought node: ${post.title}`);
+    };
+
+    const handleDeletePost = async (id: string) => {
+        setModal({
+            isOpen: true,
+            title: "Delete Thought Node",
+            message: "Permanently wipe this entry from the knowledge base?",
+            confirmText: "WIPE",
+            type: "danger",
+            onConfirm: async () => {
+                addLog("Wiping knowledge sector...");
+                try {
+                    await fetch(`/api/posts?id=${id}`, { method: "DELETE" });
+                    fetchData();
+                    addLog("SUCCESS: Node wiped.");
+                } catch (err) {
+                    addLog("ERROR: Wipe sequence failed.");
+                }
+                setModal(prev => ({ ...prev, isOpen: false }));
+            }
+        });
+    };
+
     const handleDeleteContact = async (id: string, name: string) => {
         setModal({
             isOpen: true,
@@ -379,6 +547,8 @@ export default function AdminDashboard() {
                                 { id: "profile", label: "Identity Setup", icon: User },
                                 { id: "skills", label: "Skill Matrix", icon: Star },
                                 { id: "projects", label: "Deployments", icon: Database },
+                                { id: "blog", label: "Thought Logs", icon: FileText },
+                                { id: "testimonials", label: "Endorsements", icon: Quote },
                                 { id: "contacts", label: "Communication", icon: Mail },
                             ].map((item) => (
                                 <button
@@ -424,8 +594,8 @@ export default function AdminDashboard() {
                             <motion.div key="ov" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <MetricCard label="COMM_TX" val={submissions.length} icon={Mail} color="text-accent-primary" />
-                                    <MetricCard label="BUILD_ACTIVE" val={projects.length} icon={Code} color="text-accent-secondary" />
-                                    <MetricCard label="HEALTH_INDEX" val="99.9%" icon={Activity} color="text-emerald-400" />
+                                    <MetricCard label="THOUGHT_NODES" val={posts.length} icon={FileText} color="text-accent-secondary" />
+                                    <MetricCard label="TRUST_INDEX" val={testimonials.length} icon={Quote} color="text-emerald-400" />
                                 </div>
                                 <div className="space-y-3">
                                     <p className="text-[10px] font-mono text-accent-primary tracking-widest uppercase ml-1">Live Output Monitor</p>
@@ -519,7 +689,7 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {skills.map(skill => (
+                                    {(Array.isArray(skills) ? skills : []).map(skill => (
                                         <div key={skill.id} className="glass-panel border border-white/5 p-5 rounded-[20px] flex items-center justify-between group hover:border-accent-primary/40 transition-all shadow-lg">
                                             <div className="space-y-3">
                                                 <div className="flex items-center gap-3">
@@ -567,7 +737,7 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-1 gap-4">
-                                    {submissions.map(s => (
+                                    {(Array.isArray(submissions) ? submissions : []).map(s => (
                                         <div key={s.id} className="glass-panel border border-white/5 p-6 rounded-[24px] hover:border-accent-primary/30 transition-all group shadow-lg">
                                             <div className="flex justify-between items-start mb-6 border-b border-white/5 pb-4">
                                                 <div className="flex items-center gap-4">
@@ -590,6 +760,132 @@ export default function AdminDashboard() {
                                                 <p className="text-[9px] text-accent-primary font-bold tracking-[0.2em] opacity-40 uppercase ml-1">Decrypted Content:</p>
                                                 <p className="text-xs text-white/70 leading-relaxed font-sans bg-black/20 p-4 rounded-xl border border-white/5 italic">"{s.message}"</p>
                                             </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {activeTab === "blog" && (
+                            <motion.div key="bl" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-12">
+                                <div className="glass-panel border border-white/10 p-8 rounded-[32px] space-y-8 shadow-xl">
+                                    <div className="flex items-center gap-4 border-b border-white/5 pb-6">
+                                        <FileText className="w-6 h-6 text-accent-secondary" />
+                                        <h3 className="text-[11px] font-black text-white uppercase tracking-[0.4em] flex-1">
+                                            {editingPost ? 'Refactor Thought Node' : 'Initialize New Thought Node'}
+                                        </h3>
+                                        {editingPost && (
+                                            <button onClick={() => { setEditingPost(null); setNewPost({ title: "", excerpt: "", content: "", category: "Architecture", reading_time: "5 min read", image_url: "" }); }} className="text-[9px] text-red-400 hover:text-red-300 font-bold tracking-widest">CANCEL_EDIT</button>
+                                        )}
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <FormGroup label="Node Title" val={newPost.title} onChange={e => setNewPost({ ...newPost, title: e })} />
+                                        <FormGroup label="Category / Stream" val={newPost.category} onChange={e => setNewPost({ ...newPost, category: e })} />
+                                        <FormGroup label="Reading Est." val={newPost.reading_time} onChange={e => setNewPost({ ...newPost, reading_time: e })} />
+                                        <FormGroup label="Cover URL" val={newPost.image_url} onChange={e => setNewPost({ ...newPost, image_url: e })} />
+                                        <div className="md:col-span-2 space-y-2.5">
+                                            <label className="text-[10px] font-bold text-accent-primary uppercase tracking-[0.2em] ml-1">Excerpt_Preview</label>
+                                            <input className="w-full bg-[#050505] border border-white/10 rounded-2xl p-4 text-xs text-white outline-none focus:border-accent-primary"
+                                                value={newPost.excerpt} onChange={e => setNewPost({ ...newPost, excerpt: e.target.value })} />
+                                        </div>
+                                        <div className="md:col-span-2 space-y-2.5">
+                                            <label className="text-[10px] font-bold text-accent-primary uppercase tracking-[0.2em] ml-1">Full_Content_Payload</label>
+                                            <textarea placeholder="Write in markdown or plain text..." className="w-full bg-[#050505] border border-white/10 rounded-2xl p-6 text-xs text-white/80 outline-none focus:border-accent-primary min-h-[300px] resize-none transition-all shadow-inner"
+                                                value={newPost.content} onChange={e => setNewPost({ ...newPost, content: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <button onClick={handleCreatePost} className="group w-full py-5 bg-accent-secondary text-white text-[11px] font-black rounded-2xl shadow-xl hover:shadow-accent-secondary/20 transition-all uppercase tracking-[0.5em] active:scale-[0.98] overflow-hidden relative">
+                                        <span className="relative z-10">{editingPost ? 'Execute Refactor' : 'Deploy Node'}</span>
+                                        <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[0%] transition-transform duration-500"></div>
+                                    </button>
+                                </div>
+                                <div className="space-y-4">
+                                    {(Array.isArray(posts) ? posts : []).map(p => (
+                                        <div key={p.id} className="glass-panel border border-white/5 p-6 rounded-[24px] flex justify-between items-center group transition-all hover:border-accent-secondary/40 shadow-lg">
+                                            <div className="flex items-center gap-5">
+                                                <div className="p-3 bg-white/5 rounded-2xl border border-white/5 group-hover:bg-accent-secondary/10 group-hover:border-accent-secondary/20 transition-all">
+                                                    <FileText className="w-5 h-5 text-accent-secondary opacity-40 group-hover:opacity-100 transition-opacity" />
+                                                </div>
+                                                <div>
+                                                    <span className="text-[14px] font-black text-white uppercase tracking-tight block">{p.title}</span>
+                                                    <div className="flex items-center gap-3 mt-1 text-[9px] text-muted-foreground font-mono uppercase tracking-widest">
+                                                        <span>{p.category}</span>
+                                                        <span className="w-1 h-1 rounded-full bg-white/20"></span>
+                                                        <span>{p.reading_time}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => handleEditPost(p)} className="p-3 bg-accent-secondary/10 text-accent-secondary rounded-xl hover:bg-accent-secondary hover:text-white border border-accent-secondary/20 transition-all">
+                                                    <Settings className="w-5 h-5" />
+                                                </button>
+                                                <button onClick={() => handleDeletePost(p.id)} className="p-3 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500 hover:text-white border border-red-500/20 transition-all">
+                                                    <Trash2 className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {activeTab === "testimonials" && (
+                            <motion.div key="ts" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-12">
+                                <div className="glass-panel border border-white/10 p-8 rounded-[32px] space-y-8 shadow-xl">
+                                    <div className="flex items-center gap-4 border-b border-white/5 pb-6">
+                                        <Quote className="w-6 h-6 text-emerald-400" />
+                                        <h3 className="text-[11px] font-black text-white uppercase tracking-[0.4em] flex-1">
+                                            {editingTestimonial ? 'Update Trust Index' : 'Add New Trust Node'}
+                                        </h3>
+                                        {editingTestimonial && (
+                                            <button onClick={() => { setEditingTestimonial(null); setNewTestimonial({ name: "", role: "", company: "", quote: "", avatar_url: "" }); }} className="text-[9px] text-red-400 hover:text-red-300 font-bold tracking-widest">CANCEL_EDIT</button>
+                                        )}
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <FormGroup label="Endorser Name" val={newTestimonial.name} onChange={e => setNewTestimonial({ ...newTestimonial, name: e })} />
+                                        <FormGroup label="System Role" val={newTestimonial.role} onChange={e => setNewTestimonial({ ...newTestimonial, role: e })} />
+                                        <FormGroup label="Organization" val={newTestimonial.company} onChange={e => setNewTestimonial({ ...newTestimonial, company: e })} />
+                                        <FormGroup label="Avatar Node URL" val={newTestimonial.avatar_url} onChange={e => setNewTestimonial({ ...newTestimonial, avatar_url: e })} />
+                                        <div className="md:col-span-2 space-y-2.5">
+                                            <label className="text-[10px] font-bold text-accent-primary uppercase tracking-[0.2em] ml-1">Endorsement_Transcript</label>
+                                            <textarea placeholder="Paste the client testimonial here..." className="w-full bg-[#050505] border border-white/10 rounded-2xl p-6 text-xs text-white/80 outline-none focus:border-accent-primary min-h-[140px] resize-none transition-all shadow-inner"
+                                                value={newTestimonial.quote} onChange={e => setNewTestimonial({ ...newTestimonial, quote: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <button onClick={handleCreateTestimonial} className="group w-full py-5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-black rounded-2xl shadow-xl hover:bg-emerald-500 hover:text-white transition-all uppercase tracking-[0.5em] active:scale-[0.98] overflow-hidden relative">
+                                        <span className="relative z-10">{editingTestimonial ? 'Execute Update' : 'Initialize Node'}</span>
+                                        <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[0%] transition-transform duration-500"></div>
+                                    </button>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {(Array.isArray(testimonials) ? testimonials : []).map(t => (
+                                        <div key={t.id} className="glass-panel border border-white/5 p-6 rounded-[28px] hover:border-emerald-500/40 transition-all group shadow-lg">
+                                            <div className="flex justify-between items-start mb-6">
+                                                <div className="flex items-center gap-4">
+                                                    {t.avatar_url ? (
+                                                        <img src={t.avatar_url} alt={t.name} className="w-12 h-12 rounded-2xl object-cover border border-white/10" />
+                                                    ) : (
+                                                        <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-bold border border-emerald-500/20">
+                                                            {t.name[0]}
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <span className="text-[13px] font-black text-white uppercase tracking-tight block">{t.name}</span>
+                                                        <span className="text-[9px] text-emerald-400/60 font-mono block uppercase tracking-widest">{t.role} {t.company && `@ ${t.company}`}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <button onClick={() => handleEditTestimonial(t)} className="p-2.5 bg-white/5 text-white/40 rounded-lg hover:text-white transition-all">
+                                                        <Settings className="w-4 h-4" />
+                                                    </button>
+                                                    <button onClick={() => handleDeleteTestimonial(t.id)} className="p-2.5 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p className="text-[11px] text-white/70 leading-relaxed font-sans italic border-l-2 border-emerald-500/30 pl-4 py-2 bg-white/2 rounded-r-xl">
+                                                "{t.quote}"
+                                            </p>
                                         </div>
                                     ))}
                                 </div>
@@ -625,7 +921,7 @@ export default function AdminDashboard() {
                                     </button>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {projects.map(p => (
+                                    {(Array.isArray(projects) ? projects : []).map(p => (
                                         <div key={p.id} className="glass-panel border border-white/5 p-6 rounded-[28px] flex justify-between items-center group transition-all hover:border-accent-primary/40 shadow-lg">
                                             <div className="flex items-center gap-5">
                                                 <div className="p-3 bg-white/5 rounded-2xl border border-white/5 group-hover:bg-accent-primary/10 group-hover:border-accent-primary/20 transition-all">

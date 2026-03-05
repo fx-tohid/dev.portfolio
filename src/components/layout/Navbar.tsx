@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 const navLinks = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
+    { name: "Blog", path: "/blog" },
     { name: "Projects", path: "/projects" },
     { name: "Contact", path: "/contact" },
 ];
@@ -46,8 +47,8 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <nav
                     className={`flex items-center justify-between px-8 py-3 rounded-[24px] border transition-all duration-500 overflow-hidden group ${scrolled
-                            ? "bg-slate-950/80 backdrop-blur-2xl border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
-                            : "bg-transparent border-transparent"
+                        ? "bg-slate-950/80 backdrop-blur-2xl border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
+                        : "bg-transparent border-transparent"
                         }`}
                 >
                     {/* Animated background glow inside navbar */}
@@ -72,8 +73,8 @@ export default function Navbar() {
                                     key={link.name}
                                     href={link.path}
                                     className={`relative px-5 py-2 font-mono text-[10px] uppercase font-bold tracking-[0.2em] rounded-xl transition-all ${isActive
-                                            ? "text-accent-primary"
-                                            : "text-white/40 hover:text-white hover:bg-white/5"
+                                        ? "text-accent-primary"
+                                        : "text-white/40 hover:text-white hover:bg-white/5"
                                         }`}
                                 >
                                     {link.name}

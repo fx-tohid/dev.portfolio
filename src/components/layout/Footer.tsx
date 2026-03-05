@@ -13,7 +13,10 @@ export default function Footer() {
                 </div>
 
                 <div className="flex space-x-6 items-center">
-                    <Link href="/admin" className="font-mono text-xs text-muted-foreground hover:text-accent-cyan transition-colors border border-panel-border px-2 py-1 rounded">
+                    <Link href="/blog" className="font-mono text-xs text-muted-foreground hover:text-white transition-colors">
+                        blog.txt
+                    </Link>
+                    <Link href="/admin" className="font-mono text-xs text-muted-foreground hover:text-accent-secondary transition-colors border border-panel-border px-2 py-1 rounded">
                         sudo_admin
                     </Link>
                     <a href="#" className="text-muted-foreground hover:text-accent-green transition-colors">

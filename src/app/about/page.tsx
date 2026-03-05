@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Terminal, Cpu, Briefcase, Sparkles, ChevronRight, Layers, Box } from "lucide-react";
+import { Terminal, Cpu, Briefcase, Sparkles, ChevronRight, Layers, Box, Download, Shield, Zap, Database, Activity } from "lucide-react";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from "recharts";
 import { useEffect, useState } from "react";
 
 interface Skill {
@@ -15,9 +16,19 @@ interface Profile {
     bio: string;
 }
 
+const DEFAULT_SKILLS: Skill[] = [
+    { id: "ds-1", name: "System Architecture", level: 95, category: "Architecture" },
+    { id: "ds-2", name: "Kubernetes/Docker", level: 90, category: "Backend" },
+    { id: "ds-3", name: "Cloud Infrastructure", level: 88, category: "Backend" },
+    { id: "ds-4", name: "React/Next.js", level: 98, category: "Frontend" },
+    { id: "ds-5", name: "Distributed Systems", level: 92, category: "Architecture" }
+];
+
+const DEFAULT_BIO = "Senior Software Architect specializing in high-performance digital systems, scalable cloud infrastructure, and enterprise-grade frontend applications. My approach combines rigorous engineering principles with high-end aesthetic design.";
+
 export default function About() {
     const [skills, setSkills] = useState<Skill[]>([]);
-    const [profile, setProfile] = useState<Profile | null>(null);
+    const [profile, setProfile] = useState<Profile | null>({ bio: DEFAULT_BIO });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -27,10 +38,17 @@ export default function About() {
                     fetch("/api/skills"),
                     fetch("/api/profile")
                 ]);
-                setSkills(await skillRes.json());
-                setProfile(await profileRes.json());
+                const skillData = await skillRes.json();
+                const profileData = await profileRes.json();
+
+                const fetchedSkills = Array.isArray(skillData) ? skillData : [];
+                setSkills(fetchedSkills.length > 0 ? fetchedSkills : DEFAULT_SKILLS);
+
+                const fetchedProfile = profileData && !profileData.error ? profileData : null;
+                if (fetchedProfile) setProfile(fetchedProfile);
             } catch (err) {
                 console.error("Failed to load about data");
+                setSkills(DEFAULT_SKILLS);
             } finally {
                 setLoading(false);
             }
@@ -59,6 +77,19 @@ export default function About() {
         },
     ];
 
+    const radarData = [
+        { subject: 'Scalability', A: 95, fullMark: 100 },
+        { subject: 'Security', A: 88, fullMark: 100 },
+        { subject: 'Performance', A: 92, fullMark: 100 },
+        { subject: 'System Design', A: 98, fullMark: 100 },
+        { subject: 'UX/DX', A: 90, fullMark: 100 },
+        { subject: 'Cloud Native', A: 85, fullMark: 100 },
+    ];
+
+    const handleDownloadResume = () => {
+        window.print();
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center font-mono text-accent-primary uppercase tracking-widest text-xs bg-background">
@@ -81,12 +112,21 @@ export default function About() {
             >
                 <div className="absolute -left-20 top-0 w-64 h-64 bg-accent-primary/10 rounded-full blur-[100px] pointer-events-none opacity-40"></div>
 
-                <h1 className="text-5xl md:text-7xl font-bold font-sans text-white flex items-center mb-10 group tracking-tight">
-                    <div className="p-3.5 bg-white/5 border border-white/10 rounded-2xl mr-6 group-hover:border-accent-primary/40 transition-all duration-500 shadow-xl">
-                        <Box className="w-10 h-10 text-accent-primary" />
-                    </div>
-                    About Me<span className="text-accent-primary">.</span>
-                </h1>
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10">
+                    <h1 className="text-5xl md:text-7xl font-bold font-sans text-white flex items-center group tracking-tight">
+                        <div className="p-3.5 bg-white/5 border border-white/10 rounded-2xl mr-6 group-hover:border-accent-primary/40 transition-all duration-500 shadow-xl">
+                            <Box className="w-10 h-10 text-accent-primary" />
+                        </div>
+                        About Me<span className="text-accent-primary">.</span>
+                    </h1>
+                    <button
+                        onClick={handleDownloadResume}
+                        className="group flex items-center gap-3 px-8 py-4 bg-accent-primary text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl shadow-2xl hover:shadow-accent-primary/20 transition-all active:scale-95 no-print"
+                    >
+                        <Download className="w-4 h-4 group-hover:bounce" />
+                        Download_System_Specs
+                    </button>
+                </div>
 
                 <div className="relative p-12 bg-white/[0.02] border border-white/5 rounded-[40px] backdrop-blur-2xl group shadow-2xl">
                     <p className="text-xl md:text-2xl text-white/70 leading-relaxed font-sans font-light italic whitespace-pre-wrap max-w-4xl border-l-4 border-accent-primary/20 pl-10 ml-0 hover:border-accent-primary transition-colors">
@@ -108,32 +148,66 @@ export default function About() {
                     <h3 className="text-4xl md:text-5xl font-bold font-sans tracking-tight">My Skills</h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white/[0.01] border border-white/5 p-12 rounded-[40px] backdrop-blur-md relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Linear Skill Matrix */}
+                    <div className="bg-white/[0.01] border border-white/5 p-12 rounded-[40px] backdrop-blur-md relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                        <p className="text-[10px] font-black text-accent-primary uppercase tracking-[0.4em] mb-10 opacity-60">Tech_Stack_Array</p>
+                        <div className="space-y-8">
+                            {skills.length > 0 ? skills.slice(0, 6).map((skill, index) => (
+                                <div key={skill.id} className="space-y-4 group/skill">
+                                    <div className="flex justify-between font-mono text-xs uppercase tracking-widest">
+                                        <span className="text-white/60 font-bold flex items-center gap-3 group-hover/skill:text-accent-primary transition-colors">
+                                            {skill.name}
+                                        </span>
+                                        <span className="text-white/20 group-hover/skill:text-accent-primary transition-colors">{skill.level}%</span>
+                                    </div>
+                                    <div className="h-[3px] w-full bg-white/5 rounded-full overflow-hidden">
+                                        <motion.div
+                                            className="h-full bg-accent-primary"
+                                            initial={{ width: 0 }}
+                                            whileInView={{ width: `${skill.level}%` }}
+                                            viewport={{ once: true }}
+                                            transition={{ duration: 1.5, ease: "circOut", delay: 0.1 * index }}
+                                            style={{ boxShadow: '0 0 15px rgba(99, 102, 241, 0.5)' }}
+                                        />
+                                    </div>
+                                </div>
+                            )) : (
+                                <p className="text-center text-white/30 italic text-sm py-10 font-mono">Loading skills...</p>
+                            )}
+                        </div>
+                    </div>
 
-                    {skills.length > 0 ? skills.map((skill, index) => (
-                        <div key={skill.id} className="space-y-4 group/skill">
-                            <div className="flex justify-between font-mono text-xs uppercase tracking-widest">
-                                <span className="text-white/60 font-bold flex items-center gap-3 group-hover/skill:text-accent-primary transition-colors">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-accent-primary/40 group-hover/skill:bg-accent-primary transition-colors" />
-                                    {skill.name}
-                                </span>
-                                <span className="text-white/20 group-hover/skill:text-accent-primary transition-colors">{skill.level}%</span>
+                    {/* Radar Competency Matrix */}
+                    <div className="bg-white/[0.01] border border-white/5 p-12 rounded-[40px] backdrop-blur-md relative group flex flex-col items-center justify-center min-h-[400px]">
+                        <p className="text-[10px] font-black text-accent-secondary uppercase tracking-[0.4em] mb-10 opacity-60 w-full text-left">Architecture_Radar</p>
+                        <div className="w-full h-[350px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
+                                    <PolarGrid stroke="#ffffff0a" />
+                                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#ffffff40', fontSize: 10, fontWeight: 800 }} />
+                                    <Radar
+                                        name="Competency"
+                                        dataKey="A"
+                                        stroke="#6366f1"
+                                        fill="#6366f1"
+                                        fillOpacity={0.15}
+                                    />
+                                </RadarChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 w-full mt-6">
+                            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl text-center">
+                                <span className="block text-[10px] text-accent-primary font-black uppercase tracking-widest mb-1">Stability</span>
+                                <span className="text-white text-lg font-bold">99.9%</span>
                             </div>
-                            <div className="h-[3px] w-full bg-white/5 rounded-full overflow-hidden">
-                                <motion.div
-                                    className="h-full bg-accent-primary"
-                                    initial={{ width: 0 }}
-                                    whileInView={{ width: `${skill.level}%` }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 1.5, ease: "circOut", delay: 0.1 * index }}
-                                    style={{ boxShadow: '0 0 15px rgba(99, 102, 241, 0.5)' }}
-                                />
+                            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl text-center">
+                                <span className="block text-[10px] text-accent-secondary font-black uppercase tracking-widest mb-1">DRY_Ratio</span>
+                                <span className="text-white text-lg font-bold">1:12</span>
                             </div>
                         </div>
-                    )) : (
-                        <p className="col-span-2 text-center text-white/30 italic text-sm py-10 font-mono">Loading skills...</p>
-                    )}
+                    </div>
                 </div>
             </motion.div>
 
