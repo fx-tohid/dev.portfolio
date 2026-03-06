@@ -15,7 +15,7 @@ export default function ScrambleText({ text, duration = 1000, className, trigger
     const [output, setOutput] = useState(text);
     const frameRef = useRef(0);
     const queueRef = useRef<{ from: string; to: string; start: number; end: number; char?: string }[]>([]);
-    const requestRef = useRef<number>();
+    const requestRef = useRef<number>(0);
 
     const update = (time: number) => {
         let complete = 0;
