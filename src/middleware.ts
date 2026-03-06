@@ -32,8 +32,9 @@ export async function middleware(request: NextRequest) {
 
     const { pathname } = request.nextUrl;
 
-    // If accessing /admin (but not /admin/login) and not logged in → redirect to login
-    if (pathname.startsWith("/admin") && pathname !== "/admin/login" && !user) {
+    // If accessing /admin (but not /admin/login or /admin/register) and not logged in → redirect to login
+    const isAuthRoute = pathname.startsWith("/admin/login") || pathname.startsWith("/admin/register");
+    if (pathname.startsWith("/admin") && !isAuthRoute && !user) {
         const loginUrl = request.nextUrl.clone();
         loginUrl.pathname = "/admin/login";
         return NextResponse.redirect(loginUrl);

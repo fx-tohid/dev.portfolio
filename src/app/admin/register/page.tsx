@@ -79,7 +79,10 @@ export default function AdminRegister() {
                                 <ShieldCheck className="w-8 h-8" />
                             </div>
                             <h2 className="text-xl font-bold text-white mb-2">Registration_Successful</h2>
-                            <p className="text-xs text-muted-foreground font-mono mb-8">Verification link sent to encrypted stream.</p>
+                            <p className="text-xs text-muted-foreground font-mono mb-4 italic">Verification link sent to encrypted stream.</p>
+                            <p className="text-[10px] text-accent-primary font-mono mb-8 brightness-150 underline decoration-accent-primary/30">
+                                IMPORTANT: Check your email inbox & spam to confirm identity before login.
+                            </p>
                             <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                                 <motion.div
                                     initial={{ width: 0 }}
