@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Terminal, Menu, X, Command, Code, Box } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { useState, useEffect } from "react";
+import Magnetic from "@/components/ui/Magnetic";
 
 const navLinks = [
     { name: "Home", path: "/" },
@@ -18,6 +19,13 @@ export default function Navbar() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+
+    const { scrollYProgress } = useScroll();
+    const scaleX = useSpring(scrollYProgress, {
+        stiffness: 100,
+        damping: 30,
+        restDelta: 0.001
+    });
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -44,6 +52,12 @@ export default function Navbar() {
             className={`fixed top-0 w-full z-[100] transition-all duration-500 ${scrolled ? "py-4 md:py-5" : "py-8 md:py-10"
                 }`}
         >
+            {/* Elite Scroll Progress Line */}
+            <motion.div
+                className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-accent-primary to-accent-secondary origin-left z-[101]"
+                style={{ scaleX }}
+            />
+
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <nav
                     className={`flex items-center justify-between px-8 py-3 rounded-[24px] border transition-all duration-500 overflow-hidden group ${scrolled
@@ -54,15 +68,17 @@ export default function Navbar() {
                     {/* Animated background glow inside navbar */}
                     <div className="absolute inset-0 bg-gradient-to-r from-accent-primary/5 via-transparent to-accent-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 -z-10" />
 
-                    {/* Logo */}
-                    <Link href="/" className="flex items-center space-x-3 group z-[110]">
-                        <div className="p-2.5 bg-accent-primary/10 rounded-xl group-hover:bg-accent-primary/20 transition-all duration-500 border border-accent-primary/5 group-hover:border-accent-primary/30">
-                            <Box className="w-5 h-5 text-accent-primary group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
-                        </div>
-                        <span className="font-mono font-bold text-lg tracking-tight text-white transition-all group-hover:text-accent-primary">
-                            system<span className="text-accent-primary">.</span>node<span className="text-accent-primary animate-pulse">_</span>
-                        </span>
-                    </Link>
+                    {/* Logo with Magnetic pull */}
+                    <Magnetic strength={0.2}>
+                        <Link href="/" className="flex items-center space-x-3 group z-[110]">
+                            <div className="p-2.5 bg-accent-primary/10 rounded-xl group-hover:bg-accent-primary/20 transition-all duration-500 border border-accent-primary/5 group-hover:border-accent-primary/30">
+                                <Box className="w-5 h-5 text-accent-primary group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+                            </div>
+                            <span className="font-mono font-bold text-lg tracking-tight text-white transition-all group-hover:text-accent-primary">
+                                system<span className="text-accent-primary">.</span>node<span className="text-accent-primary animate-pulse">_</span>
+                            </span>
+                        </Link>
+                    </Magnetic>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-1">

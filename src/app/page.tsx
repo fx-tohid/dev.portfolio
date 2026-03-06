@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { Terminal, Github, ExternalLink, Code, Database, Layout, Mail, ChevronRight, Activity, Shield, Sparkles, Binary, Cpu, Globe, Layers, Zap, Quote } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import ScrambleText from "@/components/ui/ScrambleText";
+import Magnetic from "@/components/ui/Magnetic";
 
 interface Project {
   id: string;
@@ -173,7 +175,7 @@ export default function Home() {
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter text-foreground mb-4 leading-tight whitespace-nowrap overflow-visible">
                 Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-primary via-white to-accent-secondary glow-text-primary">
-                  {profile?.name || 'Nazrul'}
+                  <ScrambleText text={profile?.name || 'Nazrul'} />
                 </span>
                 <span className="text-accent-primary">.</span>
               </h1>
@@ -181,7 +183,7 @@ export default function Home() {
               <div className="flex items-center gap-4 mb-8">
                 <div className="h-[2px] w-12 bg-accent-primary/50"></div>
                 <h2 className="text-xl md:text-2xl text-muted-foreground font-medium tracking-tight">
-                  {profile?.role || 'Full Stack Developer'}
+                  <ScrambleText text={profile?.role || 'Senior Software Architect'} duration={2000} />
                 </h2>
               </div>
 
@@ -190,19 +192,23 @@ export default function Home() {
               </p>
 
               <div className="flex flex-wrap gap-5">
-                <Link
-                  href="/projects"
-                  className="px-10 py-4 bg-accent-primary text-white font-bold rounded-xl hover:shadow-[0_0_40px_rgba(99,102,241,0.4)] transition-all duration-500 flex items-center group relative overflow-hidden active:scale-95 text-sm uppercase tracking-widest"
-                >
-                  <span className="relative z-10 font-bold">View My Work</span>
-                  <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform relative z-10" />
-                </Link>
-                <Link
-                  href="/contact"
-                  className="px-10 py-4 border border-white/10 bg-white/5 hover:border-accent-primary/50 text-white/80 hover:text-white transition-all duration-500 flex items-center rounded-xl backdrop-blur-md active:scale-95 group text-sm uppercase tracking-widest"
-                >
-                  <span>Get In Touch</span>
-                </Link>
+                <Magnetic>
+                  <Link
+                    href="/projects"
+                    className="px-10 py-4 bg-accent-primary text-white font-bold rounded-xl hover:shadow-[0_0_40px_rgba(99,102,241,0.4)] transition-all duration-500 flex items-center group relative overflow-hidden active:scale-95 text-sm uppercase tracking-widest"
+                  >
+                    <span className="relative z-10 font-bold">View My Work</span>
+                    <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform relative z-10" />
+                  </Link>
+                </Magnetic>
+                <Magnetic strength={0.4}>
+                  <Link
+                    href="/contact"
+                    className="px-10 py-4 border border-white/10 bg-white/5 hover:border-accent-primary/50 text-white/80 hover:text-white transition-all duration-500 flex items-center rounded-xl backdrop-blur-md active:scale-95 group text-sm uppercase tracking-widest"
+                  >
+                    <span>Get In Touch</span>
+                  </Link>
+                </Magnetic>
               </div>
 
               {/* Hero Statistics - Refined */}
