@@ -79,7 +79,7 @@ const DEFAULT_TESTIMONIALS: Testimonial[] = [
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [profile, setProfile] = useState<Profile | null>({
-    name: "Nazrul Islam",
+    name: "Nazrul",
     role: "Senior Software Architect"
   });
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);

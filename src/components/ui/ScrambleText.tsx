@@ -9,9 +9,9 @@ interface ScrambleTextProps {
     trigger?: boolean;
 }
 
-const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%#!@&*";
+const characters = "segdry@%^$#%#!@&*";
 
-export default function ScrambleText({ text, duration = 1500, className, trigger = true }: ScrambleTextProps) {
+export default function ScrambleText({ text, duration = 1000, className, trigger = true }: ScrambleTextProps) {
     const [output, setOutput] = useState(text);
     const frameRef = useRef(0);
     const queueRef = useRef<{ from: string; to: string; start: number; end: number; char?: string }[]>([]);

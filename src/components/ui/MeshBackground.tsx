@@ -6,9 +6,15 @@ export default function MeshBackground() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+        // const canvas = canvasRef.current;
+        // if (!canvas) return;
 
+        // const ctx = canvas.getContext("2d");
+        // if (!ctx) return;
+
+
+
+        const canvas = canvasRef.current!;
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
@@ -68,13 +74,14 @@ export default function MeshBackground() {
                 if (mouse.x !== null && mouse.y !== null) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    let distance = Math.sqrt(dx * dx + dy * dy) || 1;
                     let forceDirectionX = dx / distance;
                     let forceDirectionY = dy / distance;
                     let maxDistance = mouse.radius;
                     let force = (maxDistance - distance) / maxDistance;
                     let directionX = forceDirectionX * force * this.density;
                     let directionY = forceDirectionY * force * this.density;
+
 
                     if (distance < mouse.radius) {
                         this.x -= directionX;
